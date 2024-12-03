@@ -10,10 +10,10 @@
 
     <Grid>
         <Button Content="▶ Учет клиентов" HorizontalAlignment="Left" Height="30" Margin="6,87,0,0" VerticalAlignment="Top" Width="220" HorizontalContentAlignment="Left" Background="{x:Null}" Foreground="White" BorderBrush="{x:Null}" Grid.ColumnSpan="2" Click="Button_Click"/>
-        <Button Content="▶ Закупки и учет поставок" HorizontalAlignment="Left" Height="30" Margin="6,137,0,0" VerticalAlignment="Top" Width="220" HorizontalContentAlignment="Left" Background="{x:Null}" Foreground="White" BorderBrush="{x:Null}" Grid.ColumnSpan="2" Click="Button_Click_1"/>
-        <Button Content="▶ Продажа и резервирование мат-ов" HorizontalAlignment="Left" Height="30" Margin="6,187,0,0" VerticalAlignment="Top" Width="220" HorizontalContentAlignment="Left" Background="{x:Null}" Foreground="White" BorderBrush="{x:Null}" Grid.ColumnSpan="2"/>
-        <Button Content="▶ Инвентаризация и учет перемещений" HorizontalAlignment="Left" Height="30" Margin="6,237,0,0" VerticalAlignment="Top" Width="234" HorizontalContentAlignment="Left" Background="{x:Null}" Foreground="White" BorderBrush="{x:Null}"  Grid.ColumnSpan="2"/>
-        <Button Content="▶ Отчетность и аналитика" HorizontalAlignment="Left" Height="30" Margin="8,287,0,0" VerticalAlignment="Top" Width="220" HorizontalContentAlignment="Left" Background="{x:Null}" Foreground="White" BorderBrush="{x:Null}" Grid.ColumnSpan="2"/>
+        <Button Content="▶ Оборудование" HorizontalAlignment="Left" Height="30" Margin="6,137,0,0" VerticalAlignment="Top" Width="220" HorizontalContentAlignment="Left" Background="{x:Null}" Foreground="White" BorderBrush="{x:Null}" Grid.ColumnSpan="2" Click="Button_Click_1"/>
+        <Button Content="▶ Заказы" HorizontalAlignment="Left" Height="30" Margin="6,187,0,0" VerticalAlignment="Top" Width="220" HorizontalContentAlignment="Left" Background="{x:Null}" Foreground="White" BorderBrush="{x:Null}" Grid.ColumnSpan="2" Click="Button_Click_2"/>
+        <Button Content="▶ Аренда" HorizontalAlignment="Left" Height="30" Margin="6,237,0,0" VerticalAlignment="Top" Width="234" HorizontalContentAlignment="Left" Background="{x:Null}" Foreground="White" BorderBrush="{x:Null}"  Grid.ColumnSpan="2" Click="Button_Click_3"/>
+        <Button Content="▶ Отчетность и аналитика" HorizontalAlignment="Left" Height="30" Margin="8,287,0,0" VerticalAlignment="Top" Width="220" HorizontalContentAlignment="Left" Background="{x:Null}" Foreground="White" BorderBrush="{x:Null}" Grid.ColumnSpan="2" Click="Button_Click_4"/>
         <Button x:Name="Exit" Content="▶ Выход" HorizontalAlignment="Center" Height="30" Margin="0,968,0,0" VerticalAlignment="Top" Width="220" HorizontalContentAlignment="Left" Background="{x:Null}" Foreground="White" BorderBrush="{x:Null}" Click="Exit_Click"/>
     </Grid>
 </Page>

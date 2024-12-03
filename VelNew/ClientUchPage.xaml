@@ -33,5 +33,8 @@
         <Button Content="Удалить" Width="75" Margin="680,330,10,0" VerticalAlignment="Top" Click="DeleteButton_Click"/>
         <Label Content="Клиенты" HorizontalAlignment="Left" FontSize="16" Margin="10,0,0,0" VerticalAlignment="Center"/>
         <Button Content="Button" HorizontalAlignment="Left" Margin="545,309,0,0" VerticalAlignment="Top" Click="Button_Click"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="545,363,0,0" VerticalAlignment="Top" Click="Button_Click_1"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="565,425,0,0" VerticalAlignment="Top" Click="Button_Click_2"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="745,408,0,0" VerticalAlignment="Top" Click="Button_Click_3"/>
     </Grid>
 </Page>

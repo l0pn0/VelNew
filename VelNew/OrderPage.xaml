@@ -9,25 +9,51 @@
       Title="OrderPage">
 
     <Grid>
-        <StackPanel Margin="20">
-            <TextBlock Text="Управление Заказами" FontSize="20" FontWeight="Bold" />
 
-            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                <ComboBox x:Name="StatusFilterComboBox" Width="150" Margin="0,0,10,0" />
-                <DatePicker x:Name="StartDatePicker" Width="150" Margin="0,0,10,0" />
-                <DatePicker x:Name="EndDatePicker" Width="150" Margin="0,0,10,0" />
-                <Button Content="Фильтровать" Click="FilterOrdersButton_Click" Width="100"/>
-            </StackPanel>
+            <StackPanel Margin="20,20,20,-91">
+                <TextBlock Text="Управление Инвентарём" FontSize="20" FontWeight="Bold" />
+            <Label Content="Название инвентаря" Width="483"/>
+            <TextBox x:Name="NameTextBox"   Margin="0,10,0,0" Width="483"/>
+            <Label Content="Тип инвентаря" Width="483"/>
+            <ComboBox x:Name="EquipmentTypeComboBox"  Margin="0,10,0,0" Width="483"/>
+            <Label Content="Количество доступного" Width="483"/>
+            <TextBox x:Name="QuantityAvailableTextBox" Margin="0,10,0,0" Width="483"/>
+            <Label Content="Состояние" Width="483"/>
+            <TextBox x:Name="ConditionTextBox"  Margin="0,10,0,0" RenderTransformOrigin="0.5,0.5" Width="483">
+                <TextBox.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform Angle="0.006"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </TextBox.RenderTransform>
+            </TextBox>
+            <Label Content="Дата обслуживания" Width="483"/>
+            <DatePicker x:Name="MaintenanceDatePicker" Margin="0,10,0,0" Width="483" />
+            <Label Content="Срок годности" Width="483"/>
+            <DatePicker x:Name="ShelfLifeDatePicker" Margin="0,10,0,0" Width="483" />
+                <CheckBox x:Name="IsReservedCheckBox" Content="Зарезервировано" Margin="0,10,0,0"/>
 
-            <DataGrid x:Name="OrdersDataGrid" AutoGenerateColumns="False" Margin="0,20,0,0" Height="300" SelectionMode="Single">
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <Button Content="Добавить" Click="AddEquipmentButton_Click" Width="100" Margin="0,0,10,0"/>
+                    <Button Content="Редактировать" Click="EditEquipmentButton_Click" Width="100" Margin="0,0,10,0"/>
+                    <Button Content="Удалить" Click="DeleteEquipmentButton_Click" Width="100"/>
+                </StackPanel>
+
+            <DataGrid x:Name="EquipmentsDataGrid" AutoGenerateColumns="False" Margin="0,20,0,0" 
+                      SelectionMode="Single" SelectionChanged="EquipmentsDataGrid_SelectionChanged" Height="324" RenderTransformOrigin="0.5,0.493">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="ID Заказа" Binding="{Binding OrderID}" Width="80"/>
-                    <DataGridTextColumn Header="Клиент" Binding="{Binding ClientName}" Width="*"/>
-                    <DataGridTextColumn Header="Дата заказа" Binding="{Binding OrderDate, StringFormat=d}" Width="120"/>
-                    <DataGridTextColumn Header="Сумма" Binding="{Binding TotalAmount}" Width="100"/>
-                    <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="130"/>
+                    <DataGridTextColumn Header="ID" Binding="{Binding EquipmentID}" Width="50"/>
+                    <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Тип" Binding="{Binding EquipmentType}" Width="*"/>
+                    <DataGridTextColumn Header="Доступно" Binding="{Binding QuantityAvailable}" Width="100"/>
+                    <DataGridTextColumn Header="Состояние" Binding="{Binding Condition}" Width="*"/>
+                    <DataGridTextColumn Header="Дата обслуживания" Binding="{Binding MaintenanceDate, StringFormat=d}" Width="150"/>
+                    <DataGridTextColumn Header="Срок годности" Binding="{Binding ShelfLife, StringFormat=d}" Width="150"/>
+                    <DataGridCheckBoxColumn Header="Зарезервировано" Binding="{Binding IsReserved}" Width="100"/>
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>
-    </Grid>
+        </Grid>
 </Page>

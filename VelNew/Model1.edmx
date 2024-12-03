@@ -127,6 +127,26 @@
           <Property Name="PasswordSalt" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="RoleID" Type="int" Nullable="false" />
         </EntityType>
+        <!--Ошибки, обнаруженные при создании:
+предупреждение 6002: В таблице или представлении "CompVelo.dbo.vw_Equipments" не определен первичный ключ. Ключ был выведен, а определение таблицы или представления было создано в режиме только для чтения.-->
+        <EntityType Name="vw_Equipments">
+          <Key>
+            <PropertyRef Name="EquipmentID" />
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="EquipmentType" />
+            <PropertyRef Name="QuantityAvailable" />
+            <PropertyRef Name="Condition" />
+          </Key>
+          <Property Name="EquipmentID" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="EquipmentTypeID" Type="int" />
+          <Property Name="EquipmentType" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="QuantityAvailable" Type="int" Nullable="false" />
+          <Property Name="Condition" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="MaintenanceDate" Type="date" />
+          <Property Name="ShelfLife" Type="date" />
+          <Property Name="IsReserved" Type="bit" />
+        </EntityType>
         <Association Name="FK__Equipment__Equip__5629CD9C">
           <End Role="EquipmentTypes" Type="Self.EquipmentTypes" Multiplicity="0..1" />
           <End Role="Equipments" Type="Self.Equipments" Multiplicity="*" />
@@ -288,6 +308,19 @@
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserClients" EntityType="Self.UserClients" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vw_Equipments" EntityType="Self.vw_Equipments" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vw_Equipments].[EquipmentID] AS [EquipmentID], 
+    [vw_Equipments].[Name] AS [Name], 
+    [vw_Equipments].[EquipmentTypeID] AS [EquipmentTypeID], 
+    [vw_Equipments].[EquipmentType] AS [EquipmentType], 
+    [vw_Equipments].[QuantityAvailable] AS [QuantityAvailable], 
+    [vw_Equipments].[Condition] AS [Condition], 
+    [vw_Equipments].[MaintenanceDate] AS [MaintenanceDate], 
+    [vw_Equipments].[ShelfLife] AS [ShelfLife], 
+    [vw_Equipments].[IsReserved] AS [IsReserved]
+    FROM [dbo].[vw_Equipments] AS [vw_Equipments]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK__Equipment__Equip__5629CD9C" Association="Self.FK__Equipment__Equip__5629CD9C">
             <End Role="EquipmentTypes" EntitySet="EquipmentTypes" />
             <End Role="Equipments" EntitySet="Equipments" />
@@ -488,6 +521,24 @@
           <NavigationProperty Name="Roles" Relationship="Self.FK__Users__RoleID__5165187F" FromRole="Users" ToRole="Roles" />
           <NavigationProperty Name="UserClients" Relationship="Self.FK__UserClien__UserI__797309D9" FromRole="Users" ToRole="UserClients" />
         </EntityType>
+        <EntityType Name="vw_Equipments">
+          <Key>
+            <PropertyRef Name="EquipmentID" />
+            <PropertyRef Name="Name" />
+            <PropertyRef Name="EquipmentType" />
+            <PropertyRef Name="QuantityAvailable" />
+            <PropertyRef Name="Condition" />
+          </Key>
+          <Property Name="EquipmentID" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="EquipmentTypeID" Type="Int32" />
+          <Property Name="EquipmentType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="QuantityAvailable" Type="Int32" Nullable="false" />
+          <Property Name="Condition" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="MaintenanceDate" Type="DateTime" Precision="0" />
+          <Property Name="ShelfLife" Type="DateTime" Precision="0" />
+          <Property Name="IsReserved" Type="Boolean" />
+        </EntityType>
         <Association Name="FK__Feedbacks__Clien__6477ECF3">
           <End Role="Clients" Type="Self.Clients" Multiplicity="0..1" />
           <End Role="Feedbacks" Type="Self.Feedbacks" Multiplicity="*" />
@@ -636,7 +687,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="CompVeloEntities1" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="CompVeloEntities2" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Clients" EntityType="Self.Clients" />
           <EntitySet Name="Equipments" EntityType="Self.Equipments" />
           <EntitySet Name="EquipmentTypes" EntityType="Self.EquipmentTypes" />
@@ -649,6 +700,7 @@
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
           <EntitySet Name="UserClients" EntityType="Self.UserClients" />
           <EntitySet Name="Users" EntityType="Self.Users" />
+          <EntitySet Name="vw_Equipments" EntityType="Self.vw_Equipments" />
           <AssociationSet Name="FK__Feedbacks__Clien__6477ECF3" Association="Self.FK__Feedbacks__Clien__6477ECF3">
             <End Role="Clients" EntitySet="Clients" />
             <End Role="Feedbacks" EntitySet="Feedbacks" />
@@ -703,7 +755,7 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="Хранилище CompVeloModelContainer" CdmEntityContainer="CompVeloEntities1">
+        <EntityContainerMapping StorageEntityContainer="Хранилище CompVeloModelContainer" CdmEntityContainer="CompVeloEntities2">
           <EntitySetMapping Name="Clients">
             <EntityTypeMapping TypeName="CompVeloModel.Clients">
               <MappingFragment StoreEntitySet="Clients">
@@ -835,6 +887,21 @@
                 <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
                 <ScalarProperty Name="PasswordSalt" ColumnName="PasswordSalt" />
                 <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vw_Equipments">
+            <EntityTypeMapping TypeName="CompVeloModel.vw_Equipments">
+              <MappingFragment StoreEntitySet="vw_Equipments">
+                <ScalarProperty Name="EquipmentID" ColumnName="EquipmentID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="EquipmentTypeID" ColumnName="EquipmentTypeID" />
+                <ScalarProperty Name="EquipmentType" ColumnName="EquipmentType" />
+                <ScalarProperty Name="QuantityAvailable" ColumnName="QuantityAvailable" />
+                <ScalarProperty Name="Condition" ColumnName="Condition" />
+                <ScalarProperty Name="MaintenanceDate" ColumnName="MaintenanceDate" />
+                <ScalarProperty Name="ShelfLife" ColumnName="ShelfLife" />
+                <ScalarProperty Name="IsReserved" ColumnName="IsReserved" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

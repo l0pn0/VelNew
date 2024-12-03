@@ -31,11 +31,27 @@ namespace VelNew
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-
+            MainPage.Instance.Framesidebar_2.Navigate(new ClientUchPage());
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            MainPage.Instance.Framesidebar_2.Navigate(new OrderPage());
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            MainPage.Instance.Framesidebar_2.Navigate(new Zakaz());
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            MainPage.Instance.Framesidebar_2.Navigate(new ManageRentalPage());
+        }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            MainPage.Instance.Framesidebar_2.Navigate(new Ren(this));
         }
     }
 }

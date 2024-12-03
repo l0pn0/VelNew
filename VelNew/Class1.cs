@@ -11,7 +11,7 @@ namespace VelNew
 {
     internal class Class1
     {
-        public static CompVeloEntities1 db = new CompVeloEntities1();
+        public static CompVeloEntities2 db = new CompVeloEntities2();
         public static Users LoggedUser;
 
         // Таблицы из базы данных
@@ -25,5 +25,6 @@ namespace VelNew
         public DbSet<MaintenanceLogs> MaintenanceLogs { get; set; }
         public DbSet<Feedbacks> Feedbacks { get; set; }
         public DbSet<Reservations> Reservations { get; set; }
+        public  DbSet<vw_Equipments> vw_Equipments { get; set; }
     }
 }

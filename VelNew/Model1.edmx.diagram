@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="f314682b0bd44312bad4a613cea94ad3" Name="Diagram1">
+      <Diagram DiagramId="e0a430772ba64b2ba4917e5d277fea68" Name="Diagram1">
         <EntityTypeShape EntityType="CompVeloModel.Clients" Width="1.5" PointX="3" PointY="0.875" IsExpanded="true" />
         <EntityTypeShape EntityType="CompVeloModel.Equipments" Width="1.5" PointX="3" PointY="5.75" IsExpanded="true" />
         <EntityTypeShape EntityType="CompVeloModel.EquipmentTypes" Width="1.5" PointX="0.75" PointY="6.625" IsExpanded="true" />
@@ -17,6 +17,7 @@
         <EntityTypeShape EntityType="CompVeloModel.sysdiagrams" Width="1.5" PointX="7.75" PointY="9.75" IsExpanded="true" />
         <EntityTypeShape EntityType="CompVeloModel.UserClients" Width="1.5" PointX="12.25" PointY="1.5" IsExpanded="true" />
         <EntityTypeShape EntityType="CompVeloModel.Users" Width="1.5" PointX="10" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="CompVeloModel.vw_Equipments" Width="1.5" PointX="9.75" PointY="9.75" IsExpanded="true" />
         <AssociationConnector Association="CompVeloModel.FK__Feedbacks__Clien__6477ECF3" ManuallyRouted="false" />
         <AssociationConnector Association="CompVeloModel.FK__Orders__ClientID__59FA5E80" ManuallyRouted="false" />
         <AssociationConnector Association="CompVeloModel.FK__Reservati__Clien__6A30C649" ManuallyRouted="false" />

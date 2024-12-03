@@ -23,91 +23,125 @@ namespace VelNew
     public partial class Zakaz : Page
     {
         private string connectionString = "Server=DENISMAK\\SQLEXPRESS;Database=CompVelo;Integrated Security=True;";
-        private DataTable clientsTable;
+
         public Zakaz()
         {
             InitializeComponent();
-            LoadClients();
+            LoadStatusFilter();
+            LoadOrders();
         }
-        private void LoadClients()
+        private void LoadStatusFilter()
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                SqlDataAdapter adapter = new SqlDataAdapter("SELECT * FROM Clients", connection);
-                clientsTable = new DataTable();
-                adapter.Fill(clientsTable);
-                ClientsListView.ItemsSource = clientsTable.DefaultView; // Привязываем данные к ListView
-            }
+            StatusFilterComboBox.Items.Add("Все");
+            StatusFilterComboBox.Items.Add("В ожидании");
+            StatusFilterComboBox.Items.Add("Завершен");
+            StatusFilterComboBox.Items.Add("Отменен");
+            StatusFilterComboBox.SelectedIndex = 0;
         }
 
-        private void AddOrderButton_Click(object sender, RoutedEventArgs e)
+        private void LoadOrders(string status = "Все", DateTime? startDate = null, DateTime? endDate = null)
         {
-            if (ClientsListView.SelectedItem != null)
-            {
-                DataRowView selectedClient = (DataRowView)ClientsListView.SelectedItem;
-                int clientId = (int)selectedClient["ClientID"];
+            List<Orders> orders = new List<Orders>();
 
-                using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = @"
+            SELECT o.OrderID, o.ClientID, o.OrderDate, o.TotalAmount, o.Status, 
+                   CONCAT(c.FirstName, ' ', c.LastName) AS ClientFullName
+            FROM Orders o
+            INNER JOIN Clients c ON o.ClientID = c.ClientID
+            WHERE (@Status = 'Все' OR o.Status = @Status)
+            AND (@StartDate IS NULL OR o.OrderDate >= @StartDate)
+            AND (@EndDate IS NULL OR o.OrderDate <= @EndDate)
+            ORDER BY o.OrderDate DESC";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.Add("@Status", SqlDbType.NVarChar).Value = status;
+                cmd.Parameters.Add("@StartDate", SqlDbType.DateTime).Value = (object)startDate ?? DBNull.Value;
+                cmd.Parameters.Add("@EndDate", SqlDbType.DateTime).Value = (object)endDate ?? DBNull.Value;
+
+                try
                 {
-                    string query = "INSERT INTO Orders (ClientID, EquipmentType, Quantity, RentalPeriodDays, ClientNotes, Status) VALUES (@ClientID, @EquipmentType, @Quantity, @RentalPeriodDays, @ClientNotes, @Status)";
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@ClientID", clientId);
-                    command.Parameters.AddWithValue("@EquipmentType", EquipmentTypeTextBox.Text);
-                    command.Parameters.AddWithValue("@Quantity", int.Parse(QuantityTextBox.Text));
-                    command.Parameters.AddWithValue("@RentalPeriodDays", int.Parse(RentalPeriodTextBox.Text));
-                    command.Parameters.AddWithValue("@ClientNotes", ClientNotesTextBox.Text);
+                    conn.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
 
-                    // Проверка на выбранный статус
-                    if (StatusComboBox.SelectedItem != null)
+                    while (reader.Read())
                     {
-                        command.Parameters.AddWithValue("@Status", ((ComboBoxItem)StatusComboBox.SelectedItem).Content.ToString());
+                        orders.Add(new Orders
+                        {
+                            OrderID = reader.GetInt32(reader.GetOrdinal("OrderID")),
+                            ClientID = reader.GetInt32(reader.GetOrdinal("ClientID")),
+                            OrderDate = reader.GetDateTime(reader.GetOrdinal("OrderDate")),
+                            TotalAmount = reader.IsDBNull(reader.GetOrdinal("TotalAmount"))
+                                          ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalAmount")),
+                            Status = reader.GetString(reader.GetOrdinal("Status"))
+                            // Не сохраняем имя клиента в Orders
+                        });
                     }
-                    else
-                    {
-                        MessageBox.Show("Пожалуйста, выберите статус заказа.");
-                        return; // Выход из метода, если статус не выбран
-                    }
-
-                    connection.Open();
-                    command.ExecuteNonQuery(); // Выполняем команду добавления
                 }
+                catch (SqlException ex)
+                {
+                    MessageBox.Show($"Ошибка при загрузке заказов: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
 
-                LoadOrders(clientId); // Загружаем заказы для выбранного клиента
-                ClearOrderFields(); // Очищаем текстовые поля заказа
-            }
-            else
+            OrdersDataGrid.ItemsSource = orders;
+
+            // После загрузки заказов можно обновить DataGrid, чтобы показать имена клиентов
+            UpdateClientNames(orders);
+        }
+        private void OrdersDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Ваш код для обработки изменения выбора
+            var selectedOrder = OrdersDataGrid.SelectedItem as Orders;
+            if (selectedOrder != null)
             {
-                MessageBox.Show("Сначала выберите клиента для добавления заказа.");
+                // Дополнительные действия с выбранным заказом
+                MessageBox.Show($"Выбрано: {selectedOrder.OrderID} - {selectedOrder.Status}");
             }
         }
-        private void LoadOrders(int clientId)
+
+        private void UpdateClientNames(List<Orders> orders)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            foreach (var order in orders)
             {
-                string query = "SELECT * FROM Orders WHERE ClientID = @ClientID";
-                SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
-                adapter.SelectCommand.Parameters.AddWithValue("@ClientID", clientId);
-                DataTable ordersTable = new DataTable();
-                adapter.Fill(ordersTable);
-                OrdersListView.ItemsSource = ordersTable.DefaultView; // Привязываем данные к ListView
+                // Здесь можно получить имя клиента по ClientID,
+                // например, сделав дополнительный запрос или используя уже загруженные данные.
+                string clientName = GetClientNameById((int)order.ClientID);
+                // Обновите отображение имени клиента в DataGrid, если это необходимо
+                // Например, вы можете сделать это через DataGrid или дополнительный столбец
             }
         }
-        private void ClientsListView_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private string GetClientNameById(int clientId)
         {
-            if (ClientsListView.SelectedItem != null)
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                DataRowView selectedClient = (DataRowView)ClientsListView.SelectedItem;
-                int clientId = (int)selectedClient["ClientID"];
-                LoadOrders(clientId); // Загружаем заказы для выбранного клиента
+                string query = "SELECT CONCAT(FirstName, ' ', LastName) AS FullName FROM Clients WHERE ClientID = @ClientID";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.Add("@ClientID", SqlDbType.Int).Value = clientId;
+
+                try
+                {
+                    conn.Open();
+                    return cmd.ExecuteScalar() as string; // Возвращает полное имя клиента
+                }
+                catch (SqlException ex)
+                {
+                    MessageBox.Show($"Ошибка при получении имени клиента: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return null;
+                }
             }
         }
-        private void ClearOrderFields()
+
+        private void FilterOrdersButton_Click(object sender, RoutedEventArgs e)
         {
-            EquipmentTypeTextBox.Clear();
-            QuantityTextBox.Clear();
-            RentalPeriodTextBox.Clear();
-            ClientNotesTextBox.Clear();
-            StatusComboBox.SelectedIndex = -1; // Сброс выбора
+            string selectedStatus = StatusFilterComboBox.SelectedItem.ToString();
+            DateTime? startDate = StartDatePicker.SelectedDate;
+            DateTime? endDate = EndDatePicker.SelectedDate;
+
+            LoadOrders(selectedStatus, startDate, endDate);
         }
     }
+
 }
+

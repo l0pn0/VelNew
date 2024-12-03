@@ -13,10 +13,10 @@ namespace VelNew
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class CompVeloEntities1 : DbContext
+    public partial class CompVeloEntities2 : DbContext
     {
-        public CompVeloEntities1()
-            : base("name=CompVeloEntities1")
+        public CompVeloEntities2()
+            : base("name=CompVeloEntities2")
         {
         }
     
@@ -37,5 +37,6 @@ namespace VelNew
         public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<UserClients> UserClients { get; set; }
         public virtual DbSet<Users> Users { get; set; }
+        public virtual DbSet<vw_Equipments> vw_Equipments { get; set; }
     }
 }

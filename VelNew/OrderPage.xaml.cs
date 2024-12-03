@@ -14,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Configuration;
+
 
 namespace VelNew
 {
@@ -23,77 +25,265 @@ namespace VelNew
     public partial class OrderPage : Page
     {
         private string connectionString = "Server=DENISMAK\\SQLEXPRESS;Database=CompVelo;Integrated Security=True;";
-        private DataTable clientsTable;
+        private int selectedEquipmentId = -1;
+
         public OrderPage()
         {
             InitializeComponent();
-            LoadStatusFilter();
-            LoadOrders();
-        }
-        private void LoadStatusFilter()
-        {
-            StatusFilterComboBox.Items.Add("Все");
-            StatusFilterComboBox.Items.Add("В ожидании");
-            StatusFilterComboBox.Items.Add("Завершен");
-            StatusFilterComboBox.Items.Add("Отменен");
-            StatusFilterComboBox.SelectedIndex = 0;
-        }
+            LoadEquipmentTypes();
+            LoadEquipments();
 
-        private void LoadOrders(string status = "Все", DateTime? startDate = null, DateTime? endDate = null)
+        }
+        private void LoadEquipmentTypes()
         {
-            List<Orders> orders = new List<Orders>();
-
+            EquipmentTypeComboBox.Items.Add("Выберите Тип");
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = @"
-                    SELECT o.OrderID, CONCAT(c.FirstName, ' ', c.LastName) AS ClientName, o.OrderDate, o.TotalAmount, o.Status
-                    FROM Orders o
-                    INNER JOIN Clients c ON o.ClientID = c.ClientID
-                    WHERE (@Status = 'Все' OR o.Status = @Status)
-                      AND (@StartDate IS NULL OR o.OrderDate >= @StartDate)
-                      AND (@EndDate IS NULL OR o.OrderDate <= @EndDate)
-                    ORDER BY o.OrderDate DESC";
-
+                string query = "SELECT TypeName FROM EquipmentTypes";
                 SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Status", status);
-                if (startDate.HasValue)
-                    cmd.Parameters.AddWithValue("@StartDate", startDate.Value);
-                else
-                    cmd.Parameters.AddWithValue("@StartDate", DBNull.Value);
-                if (endDate.HasValue)
-                    cmd.Parameters.AddWithValue("@EndDate", endDate.Value);
-                else
-                    cmd.Parameters.AddWithValue("@EndDate", DBNull.Value);
-
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
-                    orders.Add(new Orders
+                    EquipmentTypeComboBox.Items.Add(reader.GetString(0));
+                }
+            }
+            EquipmentTypeComboBox.SelectedIndex = 0;
+        }
+
+        private void LoadEquipments()
+        {
+            List<vw_Equipments> equipments = new List<vw_Equipments>();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT * FROM vw_Equipments"; // Используем представление
+                SqlCommand cmd = new SqlCommand(query, conn);
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    equipments.Add(new vw_Equipments
                     {
-                        OrderID = reader.GetInt32(reader.GetOrdinal("OrderID")),
-                        ClientID = reader.GetInt32(reader.GetOrdinal("ClientID")),
-                        OrderDate = reader.GetDateTime(reader.GetOrdinal("OrderDate")),
-                        TotalAmount = reader.GetDecimal(reader.GetOrdinal("TotalAmount")),
-                        Status = reader.GetString(reader.GetOrdinal("Status"))
+                        EquipmentID = reader.GetInt32(reader.GetOrdinal("EquipmentID")),
+                        Name = reader.GetString(reader.GetOrdinal("Name")),
+                        EquipmentTypeID = reader.GetInt32(reader.GetOrdinal("EquipmentTypeID")),
+                        EquipmentType = reader.GetString(reader.GetOrdinal("EquipmentType")),
+                        QuantityAvailable = reader.GetInt32(reader.GetOrdinal("QuantityAvailable")),
+                        Condition = reader.GetString(reader.GetOrdinal("Condition")),
+                        MaintenanceDate = reader.IsDBNull(reader.GetOrdinal("MaintenanceDate")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("MaintenanceDate")),
+                        ShelfLife = reader.IsDBNull(reader.GetOrdinal("ShelfLife")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("ShelfLife")),
+                        IsReserved = reader.GetBoolean(reader.GetOrdinal("IsReserved"))
                     });
                 }
             }
 
-            OrdersDataGrid.ItemsSource = orders;
+            EquipmentsDataGrid.ItemsSource = equipments;
         }
 
-        private void FilterOrdersButton_Click(object sender, RoutedEventArgs e)
+        private void AddEquipmentButton_Click(object sender, RoutedEventArgs e)
         {
-            string selectedStatus = StatusFilterComboBox.SelectedItem.ToString();
-            DateTime? startDate = StartDatePicker.SelectedDate;
-            DateTime? endDate = EndDatePicker.SelectedDate;
+            if (ValidateInput())
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    string equipmentType = EquipmentTypeComboBox.SelectedItem.ToString();
+                    int equipmentTypeId = GetEquipmentTypeId(equipmentType);
 
-            LoadOrders(selectedStatus, startDate, endDate);
+                    string query = @"INSERT INTO Equipments 
+                                     (EquipmentTypeID, Name, QuantityAvailable, Condition, MaintenanceDate, ShelfLife, IsReserved) 
+                                     VALUES 
+                                     (@EquipmentTypeID, @Name, @QuantityAvailable, @Condition, @MaintenanceDate, @ShelfLife, @IsReserved)";
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@EquipmentTypeID", equipmentTypeId);
+                    cmd.Parameters.AddWithValue("@Name", NameTextBox.Text.Trim());
+                    cmd.Parameters.AddWithValue("@QuantityAvailable", int.Parse(QuantityAvailableTextBox.Text.Trim()));
+                    cmd.Parameters.AddWithValue("@Condition", ConditionTextBox.Text.Trim());
+                    cmd.Parameters.AddWithValue("@MaintenanceDate", (object)MaintenanceDatePicker.SelectedDate ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ShelfLife", (object)ShelfLifeDatePicker.SelectedDate ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@IsReserved", IsReservedCheckBox.IsChecked ?? false);
+
+                    conn.Open();
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Инвентарь успешно добавлен.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadEquipments();
+                        ClearFields();
+                    }
+                    catch (SqlException ex)
+                    {
+                        MessageBox.Show($"Ошибка при добавлении инвентаря: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
         }
+
+        private void EditEquipmentButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedEquipmentId == -1)
+            {
+                MessageBox.Show("Пожалуйста, выберите инвентарь для редактирования.", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (ValidateInput())
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    string equipmentType = EquipmentTypeComboBox.SelectedItem.ToString();
+                    int equipmentTypeId = GetEquipmentTypeId(equipmentType);
+
+                    string query = @"UPDATE Equipments 
+                                     SET EquipmentTypeID=@EquipmentTypeID, Name=@Name, QuantityAvailable=@QuantityAvailable, 
+                                         Condition=@Condition, MaintenanceDate=@MaintenanceDate, ShelfLife=@ShelfLife, 
+                                         IsReserved=@IsReserved 
+                                     WHERE EquipmentID=@EquipmentID";
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@EquipmentTypeID", equipmentTypeId);
+                    cmd.Parameters.AddWithValue("@Name", NameTextBox.Text.Trim());
+                    cmd.Parameters.AddWithValue("@QuantityAvailable", int.Parse(QuantityAvailableTextBox.Text.Trim()));
+                    cmd.Parameters.AddWithValue("@Condition", ConditionTextBox.Text.Trim());
+                    cmd.Parameters.AddWithValue("@MaintenanceDate", (object)MaintenanceDatePicker.SelectedDate ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ShelfLife", (object)ShelfLifeDatePicker.SelectedDate ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@IsReserved", IsReservedCheckBox.IsChecked ?? false);
+                    cmd.Parameters.AddWithValue("@EquipmentID", selectedEquipmentId);
+
+                    conn.Open();
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Инвентарь успешно обновлён.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadEquipments();
+                        ClearFields();
+                        selectedEquipmentId = -1;
+                    }
+                    catch (SqlException ex)
+                    {
+                        MessageBox.Show($"Ошибка при обновлении инвентаря: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
+
+        private void DeleteEquipmentButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedEquipmentId == -1)
+            {
+                MessageBox.Show("Пожалуйста, выберите инвентарь для удаления.", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var result = MessageBox.Show("Вы уверены, что хотите удалить этот инвентарь?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    string query = "DELETE FROM Equipments WHERE EquipmentID=@EquipmentID";
+                    SqlCommand cmd = new SqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@EquipmentID", selectedEquipmentId);
+
+                    conn.Open();
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Инвентарь успешно удалён.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadEquipments();
+                        ClearFields();
+                        selectedEquipmentId = -1;
+                    }
+                    catch (SqlException ex)
+                    {
+                        MessageBox.Show($"Ошибка при удалении инвентаря: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
+
+        private void EquipmentsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            if (EquipmentsDataGrid.SelectedItem is vw_Equipments selectedEquipment)
+            {
+                selectedEquipmentId = selectedEquipment.EquipmentID;
+                NameTextBox.Text = selectedEquipment.Name;
+                EquipmentTypeComboBox.SelectedItem = selectedEquipment.EquipmentType;
+                QuantityAvailableTextBox.Text = selectedEquipment.QuantityAvailable.ToString();
+                ConditionTextBox.Text = selectedEquipment.Condition;
+                MaintenanceDatePicker.SelectedDate = selectedEquipment.MaintenanceDate;
+                ShelfLifeDatePicker.SelectedDate = selectedEquipment.ShelfLife;
+                IsReservedCheckBox.IsChecked = selectedEquipment.IsReserved;
+            }
+        }
+
+        private bool ValidateInput()
+        {
+            if (string.IsNullOrWhiteSpace(NameTextBox.Text))
+            {
+                MessageBox.Show("Пожалуйста, введите название инвентаря.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (EquipmentTypeComboBox.SelectedIndex <= 0)
+            {
+                MessageBox.Show("Пожалуйста, выберите тип инвентаря.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (!int.TryParse(QuantityAvailableTextBox.Text.Trim(), out int quantity) || quantity < 0)
+            {
+                MessageBox.Show("Пожалуйста, введите корректное количество доступного инвентаря.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(ConditionTextBox.Text))
+            {
+                MessageBox.Show("Пожалуйста, введите состояние инвентаря.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            return true;
+        }
+
+        private void ClearFields()
+        {
+            NameTextBox.Clear();
+            EquipmentTypeComboBox.SelectedIndex = 0;
+            QuantityAvailableTextBox.Clear();
+            ConditionTextBox.Clear();
+            MaintenanceDatePicker.SelectedDate = null;
+            ShelfLifeDatePicker.SelectedDate = null;
+            IsReservedCheckBox.IsChecked = false;
+            EquipmentsDataGrid.SelectedItem = null;
+            selectedEquipmentId = -1;
+        }
+
+        private int GetEquipmentTypeId(string typeName)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT EquipmentTypeID FROM EquipmentTypes WHERE TypeName = @TypeName";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@TypeName", typeName);
+                conn.Open();
+                object result = cmd.ExecuteScalar();
+
+                if (result != null)
+                {
+                    return Convert.ToInt32(result);
+                }
+                else
+                {
+                    // Если тип инвентаря не найден, можно добавить его или обработать ошибку
+                    throw new Exception("Тип инвентаря не найден.");
+                }
+            }
+
+        }
+
+
     }
-
-
 }
 
