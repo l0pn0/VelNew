@@ -51,7 +51,7 @@ namespace VelNew
 
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
-            MainPage.Instance.Framesidebar_2.Navigate(new Ren(this));
+            MainPage.Instance.Framesidebar_2.Navigate(new Ren());
         }
     }
 }

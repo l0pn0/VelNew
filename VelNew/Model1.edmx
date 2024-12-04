@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="Хранилище CompVeloModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="Хранилище CompVeloModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Clients">
           <Key>
             <PropertyRef Name="ClientID" />
@@ -126,6 +126,22 @@
           <Property Name="PasswordHash" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="PasswordSalt" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="RoleID" Type="int" Nullable="false" />
+        </EntityType>
+        <!--Ошибки, обнаруженные при создании:
+предупреждение 6002: В таблице или представлении "CompVelo.dbo.OrderClientView" не определен первичный ключ. Ключ был выведен, а определение таблицы или представления было создано в режиме только для чтения.-->
+        <EntityType Name="OrderClientView">
+          <Key>
+            <PropertyRef Name="OrderID" />
+            <PropertyRef Name="ClientFullName" />
+            <PropertyRef Name="TotalAmount" />
+            <PropertyRef Name="Status" />
+          </Key>
+          <Property Name="OrderID" Type="int" Nullable="false" />
+          <Property Name="ClientID" Type="int" />
+          <Property Name="ClientFullName" Type="nvarchar" MaxLength="101" Nullable="false" />
+          <Property Name="OrderDate" Type="date" />
+          <Property Name="TotalAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <!--Ошибки, обнаруженные при создании:
 предупреждение 6002: В таблице или представлении "CompVelo.dbo.vw_Equipments" не определен первичный ключ. Ключ был выведен, а определение таблицы или представления было создано в режиме только для чтения.-->
@@ -308,6 +324,16 @@
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserClients" EntityType="Self.UserClients" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="OrderClientView" EntityType="Self.OrderClientView" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [OrderClientView].[OrderID] AS [OrderID], 
+    [OrderClientView].[ClientID] AS [ClientID], 
+    [OrderClientView].[ClientFullName] AS [ClientFullName], 
+    [OrderClientView].[OrderDate] AS [OrderDate], 
+    [OrderClientView].[TotalAmount] AS [TotalAmount], 
+    [OrderClientView].[Status] AS [Status]
+    FROM [dbo].[OrderClientView] AS [OrderClientView]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="vw_Equipments" EntityType="Self.vw_Equipments" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [vw_Equipments].[EquipmentID] AS [EquipmentID], 
@@ -370,8 +396,7 @@
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="CompVeloModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -749,7 +774,22 @@
             <End Role="Users" EntitySet="Users" />
             <End Role="UserClients" EntitySet="UserClients" />
           </AssociationSet>
+          <EntitySet Name="OrderClientView" EntityType="CompVeloModel.OrderClientView" />
         </EntityContainer>
+        <EntityType Name="OrderClientView">
+          <Key>
+            <PropertyRef Name="OrderID" />
+            <PropertyRef Name="ClientFullName" />
+            <PropertyRef Name="TotalAmount" />
+            <PropertyRef Name="Status" />
+          </Key>
+          <Property Name="OrderID" Type="Int32" Nullable="false" />
+          <Property Name="ClientID" Type="Int32" />
+          <Property Name="ClientFullName" Type="String" Nullable="false" MaxLength="101" FixedLength="false" Unicode="true" />
+          <Property Name="OrderDate" Type="DateTime" Precision="0" />
+          <Property Name="TotalAmount" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -902,6 +942,18 @@
                 <ScalarProperty Name="MaintenanceDate" ColumnName="MaintenanceDate" />
                 <ScalarProperty Name="ShelfLife" ColumnName="ShelfLife" />
                 <ScalarProperty Name="IsReserved" ColumnName="IsReserved" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OrderClientView">
+            <EntityTypeMapping TypeName="CompVeloModel.OrderClientView">
+              <MappingFragment StoreEntitySet="OrderClientView">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="TotalAmount" ColumnName="TotalAmount" />
+                <ScalarProperty Name="OrderDate" ColumnName="OrderDate" />
+                <ScalarProperty Name="ClientFullName" ColumnName="ClientFullName" />
+                <ScalarProperty Name="ClientID" ColumnName="ClientID" />
+                <ScalarProperty Name="OrderID" ColumnName="OrderID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

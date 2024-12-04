@@ -110,6 +110,9 @@
     <Compile Include="NavigationPage.xaml.cs">
       <DependentUpon>NavigationPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="OrderClientView.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="OrderDetails.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

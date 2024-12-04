@@ -38,5 +38,6 @@ namespace VelNew
         public virtual DbSet<UserClients> UserClients { get; set; }
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<vw_Equipments> vw_Equipments { get; set; }
+        public virtual DbSet<OrderClientView> OrderClientView { get; set; }
     }
 }

@@ -24,11 +24,9 @@ namespace VelNew
         private List<Clients> Clients;
         private Clients clients;
 
-        public Ren(List<Equipments> equipments, List<Clients> clients)
+        public Ren()
         {
             InitializeComponent();
-            Equipments = equipments;
-            Clients = clients;
 
             LoadData();
         }
