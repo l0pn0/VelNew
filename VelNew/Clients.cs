@@ -39,5 +39,9 @@ namespace VelNew
         public virtual ICollection<Reservations> Reservations { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserClients> UserClients { get; set; }
+        public override string ToString()
+        {
+            return LastName; // Возвращаем название оборудования для отображения в ComboBox
+        }
     }
 }

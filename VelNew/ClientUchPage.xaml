@@ -8,7 +8,7 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="ClientUchPage">
 
-    <Grid>
+    <Grid Margin="0,0,-53,-160">
         <ListView Name="ClientsListView" Margin="10,10,10,250">
             <ListView.View>
                 <GridView>
@@ -22,19 +22,20 @@
             </ListView.View>
         </ListView>
 
-        <TextBox Name="FirstNameTextBox" Margin="10,270,660,0" VerticalAlignment="Top" />
-        <TextBox Name="LastNameTextBox" Margin="10,300,660,0" VerticalAlignment="Top" />
-        <TextBox Name="PhoneNumberTextBox" Margin="10,330,660,0" VerticalAlignment="Top"/>
-        <TextBox Name="EmailTextBox" Margin="10,360,660,0" VerticalAlignment="Top"/>
-        <TextBox Name="AddressTextBox" Margin="10,390,660,0" VerticalAlignment="Top" />
+        <TextBox Name="FirstNameTextBox" Margin="10,400,660,0" VerticalAlignment="Top" />
+        <TextBox Name="LastNameTextBox" Margin="10,430,660,0" VerticalAlignment="Top" />
+        <TextBox Name="PhoneNumberTextBox" Margin="10,460,660,0" VerticalAlignment="Top"/>
+        <TextBox Name="EmailTextBox" Margin="10,490,660,0" VerticalAlignment="Top"/>
+        <TextBox Name="AddressTextBox" Margin="10,520,660,0" VerticalAlignment="Top" />
 
         <Button Content="Добавить" Width="75" Margin="680,270,10,0" VerticalAlignment="Top" Click="AddButton_Click"/>
         <Button Content="Редактировать" Width="75" Margin="680,300,10,0" VerticalAlignment="Top" Click="EditButton_Click"/>
         <Button Content="Удалить" Width="75" Margin="680,330,10,0" VerticalAlignment="Top" Click="DeleteButton_Click"/>
         <Label Content="Клиенты" HorizontalAlignment="Left" FontSize="16" Margin="10,0,0,0" VerticalAlignment="Center"/>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="545,309,0,0" VerticalAlignment="Top" Click="Button_Click"/>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="545,363,0,0" VerticalAlignment="Top" Click="Button_Click_1"/>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="565,425,0,0" VerticalAlignment="Top" Click="Button_Click_2"/>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="745,408,0,0" VerticalAlignment="Top" Click="Button_Click_3"/>
+        <Label Content="Фамилия" HorizontalAlignment="Left" Margin="1247,422,0,0" VerticalAlignment="Top"/>
+        <Label Content="Имя" HorizontalAlignment="Left" Margin="1247,392,0,0" VerticalAlignment="Top"/>
+        <Label Content="Телефон" HorizontalAlignment="Left" Margin="1248,449,0,0" VerticalAlignment="Top"/>
+        <Label Content="Почта" HorizontalAlignment="Left" Margin="1255,486,0,0" VerticalAlignment="Top"/>
+        <Label Content="Адрес" HorizontalAlignment="Left" Margin="1255,512,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Page>

@@ -46,10 +46,16 @@ namespace VelNew
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = "SELECT * FROM OrderClientView"; // Используем представление
-
+                // Подготовка запроса с фильтрами
+                string query = @"
+                SELECT * 
+                FROM OrderClientView
+                WHERE (@Status = 'Все' OR Status = @Status)
+                AND (@StartDate IS NULL OR OrderDate >= @StartDate)
+                AND (@EndDate IS NULL OR OrderDate <= @EndDate)";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
+                // Установка параметров
                 cmd.Parameters.Add("@Status", SqlDbType.NVarChar).Value = status;
                 cmd.Parameters.Add("@StartDate", SqlDbType.DateTime).Value = (object)startDate ?? DBNull.Value;
                 cmd.Parameters.Add("@EndDate", SqlDbType.DateTime).Value = (object)endDate ?? DBNull.Value;
@@ -84,10 +90,13 @@ namespace VelNew
 
         private void OrdersDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // Получаем выбранный заказ
             var selectedOrder = OrdersDataGrid.SelectedItem as OrderClientView;
+
             if (selectedOrder != null)
             {
-                MessageBox.Show($"Выбрано: {selectedOrder.OrderID} - {selectedOrder.Status}");
+                // Отображаем информацию о выбранном заказе
+                MessageBox.Show($"Выбрано: {selectedOrder.OrderID} - {selectedOrder.ClientFullName} - {selectedOrder.Status}");
             }
         }
 
@@ -97,9 +106,9 @@ namespace VelNew
             DateTime? startDate = StartDatePicker.SelectedDate;
             DateTime? endDate = EndDatePicker.SelectedDate;
 
+
             LoadOrders(selectedStatus, startDate, endDate);
         }
-
     }
 }
 
